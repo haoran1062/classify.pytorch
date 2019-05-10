@@ -1,0 +1,19 @@
+{
+    "model_type": "densenet",
+    "gpu_ids": [
+        0
+    ],
+    "class_number": 2050,
+    "batch_size": 64,
+    "epoch_number": 20,
+    "feature_extract": true,
+    "resume_from_path": "saved_models/densenet121/epoch_3.pth",
+    "resume_epoch": 3,
+    "train_data_path": ["/data/projects/classify_pytorch/datasets/273_classify_v1/train", "/data/datasets/sync_data/classify_sync_instances/table_631c_v8", "/data/datasets/sync_data/classify_sync_instances/table_631c_v7"],
+    "test_data_path": "/data/datasets/truth_data/new_50_class_data/crop_truth_instance",
+    "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121",
+    "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121/vis_log.log",
+    "log_name": "trainLog",
+    "show_img_iter_during_train":5,
+    "show_img_iter_during_val":50
+}
