@@ -30,6 +30,7 @@
        ```
 
     * this data path in config file is **/datasets/classify_data/train**
+    * if your train data have multi-root-path you can write root paths as a list in config file 
 * 2. `python train.py --config configs/classify2050c_densenet121.json`
 
 ### finished
@@ -41,7 +42,7 @@
     * alexnet
     * squeezenet
 * visual by visdom
- * ![FCN_results](.temp/0.png)
+ * ![classify_results](.temp/0.png)
 
 ### TODO
 * eval scripts
