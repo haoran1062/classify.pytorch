@@ -21,7 +21,7 @@ from utils.ClassifyDataLoader import ClassifyDataset
 
 parser = argparse.ArgumentParser(
     description='FCN Training params')
-parser.add_argument('--config', default='configs/classify2050c_densenet121.json')
+parser.add_argument('--config', default='configs/classify100c_densenet121.json')
 args = parser.parse_args()
 
 config_map = get_config_map(args.config)
@@ -105,10 +105,10 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
             if phase == 'train':
                 my_vis.plot('train loss', epoch_loss)
-                my_vis.plot('train acc', epoch_acc)
+                my_vis.plot('train acc', epoch_acc.item())
             elif phase == 'test':
                 my_vis.plot('test loss', epoch_loss)
-                my_vis.plot('test acc', epoch_acc)
+                my_vis.plot('test acc', epoch_acc.item())
             # print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
@@ -188,10 +188,11 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
 
     dataloaders = {}
-    train_dataset = ClassifyDataset(base_data_path=config_map['train_data_path'], train=True, transform = data_transforms['train'], device=device, little_train=False)
+    train_dataset = ClassifyDataset(base_data_path=config_map['train_data_path'], train=True, transform = data_transforms['train'], id_name_path=config_map['id_name_txt'], device=device, little_train=False)
     train_loader = DataLoader(train_dataset,batch_size=config_map['batch_size'], shuffle=True, num_workers=4)
-    test_dataset = ClassifyDataset(base_data_path=config_map['test_data_path'], train=False,transform = data_transforms['val'], device=device, little_train=False, with_file_path=False)
+    test_dataset = ClassifyDataset(base_data_path=config_map['test_data_path'], train=False,transform = data_transforms['val'], id_name_path=config_map['id_name_txt'], device=device, little_train=False, with_file_path=False)
     test_loader = DataLoader(test_dataset,batch_size=config_map['batch_size'],shuffle=False, num_workers=4)
+    id_name_map = train_dataset.id_name_map
     data_len = int(len(test_dataset) / config_map['batch_size'])
     logger.info('the dataset has %d images' % (len(train_dataset)))
     logger.info('the batch_size is %d' % (config_map['batch_size']))

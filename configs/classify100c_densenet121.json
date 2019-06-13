@@ -1,0 +1,20 @@
+{
+    "model_type": "densenet",
+    "gpu_ids": [
+        0
+    ],
+    "class_number": 100,
+    "batch_size": 128,
+    "epoch_number": 20,
+    "feature_extract": true,
+    "resume_from_path": null,
+    "resume_epoch": 0,
+    "train_data_path": "/data/datasets/truth_data/classify_data/top100_checkout/single_instance",
+    "test_data_path": "/data/projects/classify_pytorch/datasets/truth_classify/top100_test",
+    "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100",
+    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100/id.txt",
+    "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100/vis_log.log",
+    "log_name": "trainLog",
+    "show_img_iter_during_train":5,
+    "show_img_iter_during_val":50
+}

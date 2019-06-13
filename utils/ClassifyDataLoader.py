@@ -13,14 +13,15 @@ ia.seed(random.randint(1, 10000))
 
 
 class ClassifyDataset(data.Dataset):
-    def __init__(self, base_data_path, train, transform,  device, little_train=False, with_file_path=False, with_mask=False, input_size=224, C = 2048, test_mode=False):
+    def __init__(self, base_data_path, train, transform, id_name_path,  device, little_train=False, with_file_path=False, input_size=224, C = 2048, test_mode=False):
         print('data init')
         
         self.train = train
+        self.base_data_path=base_data_path
         self.transform=transform
         self.fnames = []
         self.resize = input_size
-        self.with_mask = with_mask
+        self.id_name_path = id_name_path
         self.C = C
         self.device = device
         self._test = test_mode
@@ -70,9 +71,28 @@ class ClassifyDataset(data.Dataset):
         )
 
         self.fnames = self.get_data_list(base_data_path)
-            
         self.num_samples = len(self.fnames)
+
+        self.get_id_map()
     
+    def get_id_map(self):
+        self.id_name_map = {}
+        self.name_id_map = {}
+        if not os.path.exists(self.id_name_path):
+            id_list = os.listdir(self.base_data_path)
+            with open(self.id_name_path, 'w') as f:
+                for it, cls_name in enumerate(id_list):
+                    self.name_id_map[cls_name] = it
+                    self.id_name_map[it] = cls_name
+                    f.write(cls_name+'\n')
+        else:
+            with open(self.id_name_path, 'r') as f:
+                itt = 0
+                for line in f:
+                    self.name_id_map[line.strip()] = itt
+                    self.id_name_map[itt] = line.strip()
+                    itt += 1
+
     def get_data_list(self, base_data_path):
         cls_file_list = []
         if isinstance(base_data_path, list):
@@ -84,7 +104,7 @@ class ClassifyDataset(data.Dataset):
     
     def get_label_from_path(self, in_path):
         t_str = in_path.split('/')[-2]
-        return int(t_str)
+        return self.name_id_map[t_str]
 
     def __getitem__(self,idx):
         
@@ -92,6 +112,8 @@ class ClassifyDataset(data.Dataset):
         if self._test:
             print(fname)
         img = cv2.imread(fname)
+        # h, w, c = img.shape 
+        assert img is not None, print(fname)
         label = self.get_label_from_path(fname)
         
         if self.train:
@@ -120,7 +142,7 @@ if __name__ == "__main__":
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
 
-    train_dataset = ClassifyDataset(base_data_path='/data/projects/classify_pytorch/datasets/273_classify_v1/train', train=True, transform = transform, test_mode=True, C=2050, device='cuda:0')
+    train_dataset = ClassifyDataset(base_data_path='/data/datasets/truth_data/classify_data/top100_checkout/single_instance', train=True, transform = transform, id_name_path='/data/temp/id.txt', test_mode=True, C=2050, device='cuda:0')
     train_loader = DataLoader(train_dataset, batch_size=1,shuffle=True, num_workers=0)
     train_iter = iter(train_loader)
     print(len(train_dataset))
@@ -132,7 +154,7 @@ if __name__ == "__main__":
         img = tensor2img(img, normal=True)
         cv2.imshow('img', img)
         
-        print('now label is : ', label)
+        print('now cls_id is ', label.item(), ' label is : ', train_dataset.id_name_map[label.item()])
         if cv2.waitKey(12000)&0xFF == ord('q'):
             break
 

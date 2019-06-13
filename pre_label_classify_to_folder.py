@@ -18,17 +18,11 @@ from tqdm import tqdm
 from utils.train_utils import get_config_map
 from utils.model_utils import initialize_model
 
-cfg_path = 'configs/classify2050c_densenet121_eval.json'
+# cfg_path = 'configs/classify2050c_densenet121_eval.json'
 cfg_path = 'configs/classify100c_densenet121_eval.json'
 config_map = get_config_map(cfg_path)
 
-# model_name = 'new50c_densenet_gan_data'
-# model_name = 'new50c_densenet_only_sync'
-# model_name = 'new50c_densenet_mix_data'
-# model_name = 'new50c_densenet_only_truth' # _test_on_train'
-# model_path = '/data/projects/classify_pytorch/save_weights/densenet/new50c_densenet_gan_data/densenet/epoch_6_step_0_acc_0.94.pth'
-# model_path = '/data/projects/classify_pytorch/save_weights/densenet/%s/densenet/best_model.pth'%(model_name)
-# model_path = '/data/projects/classify_pytorch/save_weights/densenet/new50c_densenet_only_truth/densenet/epoch_8_step_0_acc_0.95.pth'
+
 model_path = '/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100/epoch_3.pth'
 device = 'cuda:0'
 
@@ -80,25 +74,20 @@ def image_loader(loader, image_name, device, batch_size, img_size=224, c=3):
 
     return batch_img.to(device)
 
+def load_id_name_map(file_path):
+    mp = {}
+    with open(file_path, 'r') as f:
+        i = 0
+        for line in f:
+            mp[i] = int(line.strip())
+            i += 1
+    return mp
+
 data_transforms = transforms.Compose([
             transforms.Lambda(lambda img: padding_resize(img)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
-
-def get_iter(now_num):
-    if now_num > 47:
-        now_num %= len(str_l)
-        print(now_num, 'error!!!')
-    return str_l[now_num]
-    
-def get_cls_by_path(in_path):
-    sl = in_path.split('/')
-    return int(sl[-2])
-
-def write_result(out_path, right, wrong):
-    with open(out_path, 'w') as f:
-        f.write('right: %d\nwrong: %d\ntotal: %d\nacc: %.3f'%(right, wrong, right + wrong, float(right)/(right + wrong)))
 
 if __name__ == "__main__":
     
@@ -111,17 +100,18 @@ if __name__ == "__main__":
         model_p.load_state_dict(torch.load(config_map['load_from_path']))
     model_p.eval()
 
-    
-    # print(model_ft)
-    # base_path = '/data/datasets/train_data/new50c_classify_data/gan_data/test/'
+    id_map_path = 'saved_models/densenet121_top100/id.txt'
+    id_name_map = load_id_name_map(id_map_path)
     base_path = '/data/datasets/truth_data/classify_data/top100_checkout/train/origin/top100_multi_truth_train_20190612/'
-    # base_path = '/data/datasets/train_data/new50c_classify_data/only_truth/train/'
-    
-    # out_base_path = '/data/projects/classify_pytorch/results/vis_results/%s/'%(model_name)
-    # badcase_path = out_base_path + 'badcase/'
-    # right_path = out_base_path + 'right/'
+    out_base_path = '/data/results/temp/classify_instance/20190612_train/'
 
-    file_list = glob(base_path + '*/*.jpg')
+    # base_path = '/data/datasets/truth_data/classify_data/top100_checkout/train/origin/top100_val_20190612/'
+    # out_base_path = '/data/results/temp/classify_instance/20190612_val/'
+
+    if not os.path.exists(out_base_path):
+        os.makedirs(out_base_path)
+
+    file_list = glob(base_path + '*.jpg')
 
     batch_size = 1
     right = 0
@@ -130,12 +120,11 @@ if __name__ == "__main__":
         
         # now_input =  input('batch_size : ')
         # now_input = base_path + now_input
-        bar = tqdm(total=len(file_list))        
-        for it, now_path in enumerate(file_list):
+        for now_path in tqdm(file_list):
             
             input_list = [now_path]
             origin_img = cv2.imread(now_path)
-            now_cls = get_cls_by_path(now_path)
+            # now_cls = get_cls_by_path(now_path)
 
                 
             # ta = time.time()
@@ -147,30 +136,13 @@ if __name__ == "__main__":
             # print(output.shape)
             for j in range(output.shape[0]):
                 pred = np.argmax(output[j])
-                print(pred)
-                # ans = int(get_iter(pred))
-                ans = pred
-                if ans == now_cls:
-                    print('right!')
-                    # if not os.path.exists(right_path + '%d'%(now_cls)):
-                    #     os.makedirs(right_path + '%d'%(now_cls))
-                    # cv2.imwrite(right_path + '%d/%d_%d.jpg'%(now_cls, now_cls, it), origin_img)
-                    right += 1
-                else:
-                    print('wrong!')
-                    # if not os.path.exists(badcase_path + '%d'%(now_cls)):
-                    #     os.makedirs(badcase_path + '%d'%(now_cls))
-                    # cv2.imwrite(badcase_path + '%d/%d---%d_%d.jpg'%(now_cls, now_cls, ans, it), origin_img)
-                    wrong += 1
-            
-            bar.update(1)
-        bar.close()
-        # write_result(out_base_path+'result.txt', right, wrong)
-                # print( get_iter(pred) )
+                now_cls = id_name_map[pred]
+                now_save_path = out_base_path + '%d/'%(now_cls)
+                if not os.path.exists(now_save_path):
+                    os.makedirs(now_save_path)
+                save_id = len(os.listdir(now_save_path))
+                cv2.imwrite('%s%d_%d.jpg'%(now_save_path, now_cls, save_id), origin_img)
 
-                # tc = time.time()
-                # print('predict use time : %.2f'%(tc - tb))
+                
 
-            
-            # now_input = input('batch_size : ')
 
