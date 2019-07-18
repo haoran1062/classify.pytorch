@@ -1,0 +1,22 @@
+{
+    "model_type": "resnext101",
+    "gpu_ids": [
+        0
+    ],
+    "class_number": 800,
+    "batch_size": 128,
+    "input_size": 224,
+    "epoch_number": 24,
+    "with_wh": false,
+    "feature_extract": true,
+    "resume_from_path": "/home/ubuntu/project/classify.pytorch/saved_models/resnext101_top500_224_truth_and_sync/epoch_21.pth",
+    "resume_epoch": 18,
+    "train_data_path": ["/data/datasets/truth_data/classify_data/top500_checkout/train/20190628_train", "/data/datasets/truth_data/classify_data/top500_checkout/train/20190701_train", "/data/datasets/truth_data/classify_data/top500_checkout/train/20190702_train", "/data/datasets/truth_data/classify_data/top500_checkout/train/20190703_am_train", "/data/datasets/truth_data/classify_data/top500_checkout/train/20190703_pm_train", "/data/datasets/truth_data/classify_data/top500_checkout/train/20190703_am_train", "/data/datasets/truth_data/classify_data/top500_checkout/train/20190704_am_train", "/data/datasets/truth_data/classify_data/top100_checkout/all_classify_datasets_till_20190628/train"],
+    "test_data_path": ["/data/datasets/truth_data/classify_data/top500_checkout/val/20190628_val", "/data/datasets/truth_data/classify_data/top500_checkout/val/20190701_val", "/data/datasets/truth_data/classify_data/top500_checkout/val/20190702_val", "/data/datasets/truth_data/classify_data/top500_checkout/val/20190703_am_val", "/data/datasets/truth_data/classify_data/top500_checkout/val/20190703_pm_val", "/data/datasets/truth_data/classify_data/top500_checkout/val/20190704_am_val", "/data/datasets/truth_data/classify_data/top100_checkout/all_classify_datasets_till_20190628/val"],
+    "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/resnext101_top500_224_truth_and_sync",
+    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/resnext101_top500_224_truth_and_sync/id.txt",
+    "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/resnext101_top500_224_truth_and_sync/vis_log.log",
+    "log_name": "trainLog",
+    "show_img_iter_during_train":5,
+    "show_img_iter_during_val":50
+}

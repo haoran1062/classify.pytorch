@@ -1,8 +1,10 @@
 #encoding:utf-8
-import torchvision, torch
+import torchvision, torch, sys
 from torchvision import datasets, models, transforms
 
 import torch.nn as nn
+sys.path.insert(0, sys.path[0] + '/backbones')
+from backbones.OriginDenseNet import densenet121
 
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
@@ -19,6 +21,22 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         """ Resnet50
         """
         model_ft = models.resnet50(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+
+    elif model_name == "resnext50":
+
+        model_ft = models.resnext50_32x4d(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+    
+    elif model_name == "resnext101":
+
+        model_ft = models.resnext101_32x8d(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
@@ -54,10 +72,12 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     elif model_name == "densenet":
         """ Densenet
         """
-        model_ft = models.densenet121(pretrained=use_pretrained)
+        # model_ft = models.densenet121(pretrained=use_pretrained)
+        model_ft = densenet121(pretrained=use_pretrained, num_classes=num_classes)
         set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.classifier.in_features
-        model_ft.classifier = nn.Linear(num_ftrs, num_classes) 
+        num_ftrs = model_ft.originclassifier.in_features
+        # print(num_ftrs)
+        model_ft.originclassifier = nn.Linear(num_ftrs, num_classes) 
         input_size = 224
 
     else:

@@ -13,7 +13,7 @@ ia.seed(random.randint(1, 10000))
 
 
 class ClassifyDataset(data.Dataset):
-    def __init__(self, base_data_path, train, transform, id_name_path,  device, little_train=False, with_file_path=False, input_size=224, C = 2048, test_mode=False):
+    def __init__(self, base_data_path, train, transform, id_name_path,  device, little_train=False, with_file_path=False, origin_img_size=(1920, 1080), input_size=224, C = 2048, test_mode=False):
         print('data init')
         
         self.train = train
@@ -21,18 +21,20 @@ class ClassifyDataset(data.Dataset):
         self.transform=transform
         self.fnames = []
         self.resize = input_size
+        self.little_train = little_train
         self.id_name_path = id_name_path
         self.C = C
+        self.origin_img_size = origin_img_size
         self.device = device
         self._test = test_mode
         self.with_file_path = with_file_path
-        self.img_augsometimes = lambda aug: iaa.Sometimes(0.25, aug)
+        self.img_augsometimes = lambda aug: iaa.Sometimes(0.5, aug)
 
         self.augmentation = iaa.Sequential(
             [
                 # augment without change bboxes 
                 self.img_augsometimes(
-                    iaa.SomeOf((1, 3), [
+                    iaa.SomeOf((1, 2), [
                         iaa.Dropout([0.05, 0.2]),      # drop 5% or 20% of all pixels
                         iaa.Sharpen((0.1, .8)),       # sharpen the image
                         # iaa.GaussianBlur(sigma=(2., 3.5)),
@@ -60,11 +62,18 @@ class ClassifyDataset(data.Dataset):
                                             children=iaa.WithChannels(2, iaa.Add((-10, 50)))),
                         ]),
 
+                        # iaa.Affine(
+                        #     scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+                        #     translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+                        #     rotate=(-25, 25),
+                        #     shear=(-8, 8)
+                        # )
+
                     ], random_order=True)
                 ),
 
                 iaa.Fliplr(.5),
-                iaa.Flipud(.125),
+                iaa.Flipud(.25),
 
             ],
             random_order=True
@@ -75,11 +84,25 @@ class ClassifyDataset(data.Dataset):
 
         self.get_id_map()
     
+    def get_id_list(self):
+        id_set = set()
+        if isinstance(self.base_data_path, list):
+            for i in self.base_data_path:
+                id_tl = os.listdir(i)
+                for j in id_tl:
+                    id_set.add(j)
+        else:
+            id_tl = os.listdir(self.base_data_path)
+            for j in id_tl:
+                id_set.add(j)
+        return list(id_set)
+
+
     def get_id_map(self):
         self.id_name_map = {}
         self.name_id_map = {}
         if not os.path.exists(self.id_name_path):
-            id_list = os.listdir(self.base_data_path)
+            id_list = self.get_id_list()
             with open(self.id_name_path, 'w') as f:
                 for it, cls_name in enumerate(id_list):
                     self.name_id_map[cls_name] = it
@@ -100,6 +123,8 @@ class ClassifyDataset(data.Dataset):
                 cls_file_list = cls_file_list + glob(i + '/*/*.jpg')
         else:
             cls_file_list = glob(base_data_path + '/*/*.jpg')
+        if self.little_train:
+            return cls_file_list[:self.little_train]
         return cls_file_list
     
     def get_label_from_path(self, in_path):
@@ -112,7 +137,10 @@ class ClassifyDataset(data.Dataset):
         if self._test:
             print(fname)
         img = cv2.imread(fname)
-        # h, w, c = img.shape 
+        
+        h, w, c = img.shape 
+        h = float(h/self.origin_img_size[1])
+        w = float(w/self.origin_img_size[0])
         assert img is not None, print(fname)
         label = self.get_label_from_path(fname)
         
@@ -142,19 +170,20 @@ if __name__ == "__main__":
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
 
-    train_dataset = ClassifyDataset(base_data_path='/data/datasets/truth_data/classify_data/top100_checkout/single_instance', train=True, transform = transform, id_name_path='/data/temp/id.txt', test_mode=True, C=2050, device='cuda:0')
-    train_loader = DataLoader(train_dataset, batch_size=1,shuffle=True, num_workers=0)
+    train_dataset = ClassifyDataset(base_data_path='/data/datasets/truth_data/classify_data/top100_checkout/20190612_train', train=True, transform = transform, id_name_path='/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_truth_and_sync/id.txt', test_mode=True, C=900, device='cuda:0')
+    train_loader = DataLoader(train_dataset, batch_size=2,shuffle=True, num_workers=0)
     train_iter = iter(train_loader)
     print(len(train_dataset))
     for i in range(200):
-        img, label = next(train_iter)
+        img, label, w, h = next(train_iter)
+        print(img.shape, label.shape, w.shape, h.shape)
 
         print('~'*50 + '\n\n\n')
 
         img = tensor2img(img, normal=True)
         cv2.imshow('img', img)
         
-        print('now cls_id is ', label.item(), ' label is : ', train_dataset.id_name_map[label.item()])
+        print('now cls_id is ', label[0].item(), ' label is : ', train_dataset.id_name_map[label[0].item()], 'w :', w, ' h : ', h)
         if cv2.waitKey(12000)&0xFF == ord('q'):
             break
 

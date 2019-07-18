@@ -1,0 +1,17 @@
+{
+    "model_type": "resnext50",
+    "gpu_ids": [
+        0
+    ],
+    "class_number": 800,
+    "batch_size": 1,
+    "input_size": 512,
+    "epoch_number": 18,
+    "with_wh": false,
+    "feature_extract": true,
+    "load_from_path": "/home/ubuntu/project/classify.pytorch/saved_models/resnext50_top800_512_truth/best.pth",
+    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/resnext50_top800_512_truth/id.txt",
+    "log_name": "trainLog",
+    "show_img_iter_during_train":5,
+    "show_img_iter_during_val":50
+}

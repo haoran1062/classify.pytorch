@@ -3,18 +3,20 @@
     "gpu_ids": [
         0
     ],
-    "class_number": 100,
+    "class_number": 800,
     "batch_size": 1,
+    "input_size": 224,
     "epoch_number": 20,
+    "with_wh": true,
     "feature_extract": true,
     "resume_from_path": null,
-    "load_from_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100/epoch_3.pth",
+    "load_from_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_truth_and_sync_with_wh/epoch_12.pth",
     "resume_epoch": 0,
     "train_data_path": ["/data/projects/classify_pytorch/datasets/273_classify_v1/train", "/data/datasets/sync_data/classify_sync_instances/table_631c_v8", "/data/datasets/truth_data/classify_data/700sku_checkout"],
     "test_data_path": "/data/datasets/truth_data/new_50_class_data/crop_truth_instance",
     "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121",
     "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121/vis_log.log",
-    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100/id.txt",
+    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_truth_and_sync_with_wh/id.txt",
     "log_name": "trainLog",
     "show_img_iter_during_train":5,
     "show_img_iter_during_val":50

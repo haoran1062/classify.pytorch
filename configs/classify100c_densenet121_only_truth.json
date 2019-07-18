@@ -1,0 +1,21 @@
+{
+    "model_type": "densenet",
+    "gpu_ids": [
+        0
+    ],
+    "class_number": 800,
+    "batch_size": 128,
+    "input_size": 224,
+    "epoch_number": 7,
+    "feature_extract": true,
+    "resume_from_path": null,
+    "resume_epoch": 0,
+    "train_data_path": ["/data/datasets/truth_data/classify_data/top100_checkout/20190612_train", "/data/datasets/truth_data/classify_data/top100_checkout/20190613_train", "/data/datasets/truth_data/classify_data/top100_checkout/20190614_train", "/data/datasets/truth_data/classify_data/top100_checkout/20190618_train", "/data/datasets/truth_data/classify_data/top100_checkout/20190619_train", "/data/datasets/truth_data/classify_data/top100_checkout/20190621_train"],
+    "test_data_path": ["/data/datasets/truth_data/classify_data/top100_checkout/20190612_val", "/data/datasets/truth_data/classify_data/top100_checkout/20190613_val", "/data/datasets/truth_data/classify_data/top100_checkout/20190614_val", "/data/datasets/truth_data/classify_data/top100_checkout/20190618_val", "/data/datasets/truth_data/classify_data/top100_checkout/20190619_val", "/data/datasets/truth_data/classify_data/top100_checkout/20190621_val"],
+    "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_only_truth",
+    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_only_truth/id.txt",
+    "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_only_truth/vis_log.log",
+    "log_name": "trainLog",
+    "show_img_iter_during_train":5,
+    "show_img_iter_during_val":50
+}

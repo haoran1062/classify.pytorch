@@ -36,7 +36,7 @@
 ### finished
 * multi-GPUs support
 * support backbones
-    * resnet50
+    * resnet50, resnext50, resnext101
     * densenet121
     * vgg
     * alexnet

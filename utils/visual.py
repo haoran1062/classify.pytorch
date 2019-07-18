@@ -55,6 +55,18 @@ class Visual(object):
        
        for k, v in d.iteritems():
            self.plot(k, v)
+    
+   def multi_cls_bar(self, name, x, legend, rowname):
+       
+       self.vis.bar(
+            win=name,
+            X=x,
+            opts=dict(
+                stacked=True,
+                legend=legend,
+                rownames=rowname
+            )
+        )
 
    def img_many(self, d):
        for k, v in d.iteritems():
