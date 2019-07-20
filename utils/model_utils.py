@@ -5,6 +5,7 @@ from torchvision import datasets, models, transforms
 import torch.nn as nn
 sys.path.insert(0, sys.path[0] + '/backbones')
 from backbones.OriginDenseNet import densenet121
+from backbones.seResnet import se_resnext50_32x4d
 
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
@@ -34,6 +35,14 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
         input_size = 224
     
+    elif model_name == 'se-resnext50':
+
+        model_ft = se_resnext50_32x4d()
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.last_linear.in_features * 100
+        model_ft.last_linear = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+
     elif model_name == "resnext101":
 
         model_ft = models.resnext101_32x8d(pretrained=use_pretrained)

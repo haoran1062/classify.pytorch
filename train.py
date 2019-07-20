@@ -22,7 +22,7 @@ from utils.ClassifyDataLoader import ClassifyDataset
 parser = argparse.ArgumentParser(
     description='Classify Training params')
 # parser.add_argument('--config', default='configs/classify100c_densenet121.json')
-parser.add_argument('--config', default='configs/classify800c_resnext50_512.json')
+parser.add_argument('--config', default='configs/classify800c_se-resnext50_512.json')
 
 args = parser.parse_args()
 
@@ -38,7 +38,8 @@ if not os.path.exists(config_map['model_save_path']):
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_start=0, save_base_path='./', save_step=500, logger=None, vis=None, rename_map=None, id_name_map=None):
     since = time.time()
     
-    cosin_lr = lr_scheduler.CosineAnnealingLR(optimizer, T_max=(num_epochs // 3)+1)
+    # cosin_lr = lr_scheduler.CosineAnnealingLR(optimizer, T_max=(num_epochs // 10)+1)
+    adjust_lr = lr_scheduler.ReduceLROnPlateau(optimizer, 'max', factor=0.8, verbose=1, patience=2)
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
@@ -47,8 +48,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
         print('-' * 10)
 
         acc_map = {}
-        wh_acc_map = {}
-        cosin_lr.step(epoch)
+        # cosin_lr.step(epoch)
         my_vis.plot('lr', optimizer.param_groups[0]['lr'])
 
         # Each epoch has a training and validation phase
@@ -60,7 +60,6 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
 
             running_loss = 0.0
             running_corrects = 0
-            wh_corrects = 0
 
             # Iterate over data.
             for it, temp in enumerate(dataloaders[phase]):
@@ -136,6 +135,9 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
+
+            adjust_lr.step(epoch_acc)
+
             if phase == 'train':
                 my_vis.plot('train loss', epoch_loss)
                 my_vis.plot('train acc', epoch_acc.item())
@@ -229,7 +231,7 @@ if __name__ == "__main__":
     train_dataset = ClassifyDataset(base_data_path=config_map['train_data_path'], train=True, transform = data_transforms['train'], id_name_path=config_map['id_name_txt'], device=device, little_train=False)
     train_loader = DataLoader(train_dataset,batch_size=config_map['batch_size'], shuffle=True, num_workers=4, pin_memory=True)
     test_dataset = ClassifyDataset(base_data_path=config_map['test_data_path'], train=False,transform = data_transforms['val'], id_name_path=config_map['id_name_txt'], device=device, little_train=False, with_file_path=False)
-    test_loader = DataLoader(test_dataset,batch_size=config_map['batch_size'],shuffle=False, num_workers=4, pin_memory=True)
+    test_loader = DataLoader(test_dataset,batch_size=config_map['batch_size'],shuffle=True, num_workers=4, pin_memory=True)
     id_name_map = train_dataset.id_name_map
     data_len = int(len(test_dataset) / config_map['batch_size'])
     logger.info('the dataset has %d images' % (len(train_dataset)))

@@ -38,12 +38,15 @@
 * support backbones
     * resnet50, resnext50, resnext101
     * densenet121
+    * se-resnext50 from [pretrained-models.pytorch](https://github.com/Cadene/pretrained-models.pytorch)
     * vgg
     * alexnet
     * squeezenet
 * visual by visdom
  * ![classify_results](.temp/0.png)
 
+
+
+
 ### TODO
-* eval scripts
 * more backbones support

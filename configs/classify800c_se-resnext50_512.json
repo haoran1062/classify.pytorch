@@ -1,10 +1,10 @@
 {
-    "model_type": "resnext50",
+    "model_type": "se-resnext50",
     "gpu_ids": [
         0
     ],
     "class_number": 800,
-    "batch_size": 64,
+    "batch_size": 32,
     "input_size": 512,
     "epoch_number": 20,
     "with_wh": false,
@@ -13,9 +13,9 @@
     "resume_epoch": 0,
     "train_data_path": ["/data/datasets/truth_data/classify_data/top500_checkout/67_cls_train"],
     "test_data_path": ["/data/results/temp/classify_instance/201907/done/20190717_classify_test_test"],
-    "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/resnext50_top800_512_only_truth",
-    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/resnext50_top800_512_only_truth/id.txt",
-    "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/resnext50_top800_512_only_truth/vis_log.log",
+    "model_save_path": "/home/ubuntu/project/classify.pytorch/saved_models/se-resnext50_top800_512_only_truth",
+    "id_name_txt": "/home/ubuntu/project/classify.pytorch/saved_models/se-resnext50_top800_512_only_truth/id.txt",
+    "vis_log_path": "/home/ubuntu/project/classify.pytorch/saved_models/se-resnext50_top800_512_only_truth/vis_log.log",
     "log_name": "trainLog",
     "show_img_iter_during_train":5,
     "show_img_iter_during_val":50
