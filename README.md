@@ -1,6 +1,6 @@
 ## simple classify model by pytorch
 ### How to use
-* 1. write config (reference to **configs/classify2050c_densenet121.json**)
+* 1. write config (reference to **configs/classify800c_se-resnext50_512.json**)
     * dataset store tree:
     * ```.
         └── datasets
@@ -31,7 +31,7 @@
 
     * this data path in config file is **/datasets/classify_data/train**
     * if your train data have multi-root-path you can write root paths as a list in config file 
-* 2. `python train.py --config configs/classify2050c_densenet121.json`
+* 2. `python train.py --config configs/classify800c_se-resnext50_512.json`
 
 ### finished
 * multi-GPUs support
@@ -43,7 +43,7 @@
     * alexnet
     * squeezenet
 * visual by visdom
- * ![classify_results](.temp/0.png)
+ * ![classify_results](.temp/cls_1.png)
 
 
 
