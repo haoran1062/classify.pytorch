@@ -1,3 +1,5 @@
 saved_models/*
 *.log
 *.pth
+pre_label_classify_to_folder.py
+cnn_kmeans.py
