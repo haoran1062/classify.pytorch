@@ -1,0 +1,17 @@
+{
+    "model_type": "se-resnext50",
+    "gpu_ids": [
+        0
+    ],
+    "class_number": 800,
+    "batch_size": 1,
+    "input_size": 512,
+    "epoch_number": 20,
+    "with_wh": false,
+    "feature_extract": true,
+    "load_from_path": "/data/haoran/t/se-resnext50_512_20190723/best.pth",
+    "id_name_txt": "/data/haoran/t/se-resnext50_512_20190723/id.txt",
+    "log_name": "trainLog",
+    "show_img_iter_during_train":5,
+    "show_img_iter_during_val":50
+}

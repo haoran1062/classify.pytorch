@@ -70,8 +70,8 @@ if __name__ == "__main__":
     # base_in_path = '/data/results/temp/classify_instance/201907/0703_night_instances/'
     # base_out_path = '/data/results/temp/classify_instance/201907/cls_out/0703_classify/night/'
 
-    base_in_path = '/data/results/temp/classify_instance/201907/0717_1_instances/'
-    base_out_path = '/data/results/temp/classify_instance/201907/cls_out/0717_1_pre_cls/'
+    base_in_path = '/data/results/temp/classify_instance/201907/0724_1_instances/'
+    base_out_path = '/data/results/temp/classify_instance/201907/cls_out/0724_1_pre_cls/'
 
     # base_in_path = '/data/results/temp/classify_instance/201907/0703_7_instances/'
     # base_out_path = '/data/results/temp/classify_instance/201907/cls_out/0703_7_pre_cls/'
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     device = 'cuda:0'
     cuda = True
-    cls_n = 2
+    cls_n = 4
     
     
     cnn_resumt_path = '/home/ubuntu/project/classify.pytorch/saved_models/densenet121_top100_224_truth_and_sync_with_wh/best.pth'
@@ -88,6 +88,7 @@ if __name__ == "__main__":
     model_p = nn.DataParallel(model.to(device), device_ids=[0])
     model_p.load_state_dict(torch.load(cnn_resumt_path), strict=False)
     model_p.eval()
+    # print(model_p)
 
     it = 0
     folder_list = os.listdir(base_in_path)

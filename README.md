@@ -1,4 +1,13 @@
 ## simple classify model by pytorch
+### requirement
+* pytorch >= 1.0
+* opencv
+* PIL
+* imgaug
+* visdom
+* torchsummary
+* [jpeg4py](https://github.com/ajkxyz/jpeg4py)
+* tqdm
 ### How to use
 * 1. write config (reference to **configs/classify800c_se-resnext50_512.json**)
     * dataset store tree:
@@ -43,6 +52,10 @@
     * alexnet
     * squeezenet
 * visual by visdom
+* speedup:
+  * use `jpeg4py` replace `cv2`
+  * [speedup dataloader](https://zhuanlan.zhihu.com/p/68191407)
+
  * ![classify_results](.temp/cls_1.png)
 
 

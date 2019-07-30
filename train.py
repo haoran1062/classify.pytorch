@@ -43,6 +43,14 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
+    # prefetcher = data_prefetcher(train_loader)
+    # data = prefetcher.next()
+    # i = 0
+    # while data is not None:
+    #     print(i, len(data))
+    #     i += 1
+    #     data = prefetcher.next()
+
     for epoch in range(epoch_start, num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
@@ -61,11 +69,18 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
             running_loss = 0.0
             running_corrects = 0
 
+            prefetcher = data_prefetcher(dataloaders[phase])
+            data = prefetcher.next()
+            it = 0
+            
             # Iterate over data.
-            for it, temp in enumerate(dataloaders[phase]):
-                inputs, labels = temp
+            # for it, temp in enumerate(dataloaders[phase]):
+            while data is not None:
+                inputs, labels = data
+                # inputs, labels = temp
                 inputs = inputs.to(device)
                 labels = labels.to(device)
+                
                 st = time.clock()
                 # zero the parameter gradients
                 optimizer.zero_grad()
@@ -88,6 +103,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
+                
 
                 # statistics
                 now_loss = loss.item() * inputs.size(0)
@@ -131,7 +147,12 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, epoch_s
                     if not os.path.exists('%s'%(save_base_path)):
                         os.mkdir('%s'%(save_base_path))
                     torch.save(model.state_dict(), '%s/epoch_%d.pth'%(save_base_path, epoch))
-                    
+                
+                data = prefetcher.next()
+                it += 1
+                if it == len(dataloaders[phase]):
+                    it = 0
+                    break
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
@@ -219,7 +240,7 @@ if __name__ == "__main__":
     my_vis = Visual(config_map['model_save_path'], log_to_file=config_map['vis_log_path'])   
 
     # Observe that all parameters are being optimized
-    optimizer_ft = optim.SGD(model_p.parameters(), lr=config_map['batch_size'] / 256.0, momentum=0.9)
+    optimizer_ft = optim.SGD(model_p.parameters(), lr=0.1 * config_map['batch_size'] / 256.0, momentum=0.9)
     # optimizer_ft = optim.RMSprop(params_to_update, momentum=0.9)
     # optimizer_ft = optim.Adam(model_p.parameters(), lr=1e-2, eps=1e-8, betas=(0.9, 0.99), weight_decay=0.)
     # optimizer_ft = optim.Adadelta(params_to_update, lr=1)

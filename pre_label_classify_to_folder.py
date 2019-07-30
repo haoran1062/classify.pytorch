@@ -20,6 +20,7 @@ from utils.model_utils import initialize_model
 
 # cfg_path = 'configs/classify2050c_densenet121_eval.json'
 cfg_path = 'configs/classify100c_resnext50_eval.json'
+cfg_path = 'configs/classify800c_se-resnext50_512_eval.json'
 config_map = get_config_map(cfg_path)
 input_resize = config_map['input_size']
 
@@ -89,7 +90,7 @@ def load_classify_model(cfg_path, with_wh, device='cuda:0'):
 
     config_map = get_config_map(cfg_path)
 
-    model_ft, input_size = initialize_model(config_map['model_type'], config_map['class_number'], config_map['feature_extract'], use_pretrained=False, with_wh=with_wh)
+    model_ft, input_size = initialize_model(config_map['model_type'], config_map['class_number'], config_map['feature_extract'], use_pretrained=False)
     model_p = nn.DataParallel(model_ft.to(device), device_ids=config_map['gpu_ids'])
     model_p.load_state_dict(torch.load(config_map['load_from_path']))
     model_p.eval()
@@ -123,6 +124,9 @@ if __name__ == "__main__":
 
     base_path = '/data/results/temp/classify_instance/201907/0705_2_instances/'
     out_base_path = '/data/results/temp/classify_instance/201907/cls_out/0705_2_pre_cls/'
+
+    base_path = '/data/results/temp/classify_instance/201907/badcase_instances_20190726/'
+    out_base_path = '/data/results/temp/classify_instance/201907/cls_out/badcase_pre_cls/'
 
 
     if not os.path.exists(out_base_path):
@@ -158,13 +162,19 @@ if __name__ == "__main__":
 
                     
                 # ta = time.time()
-                t = image_loader(data_transforms, input_list, device, batch_size)
+                # t = image_loader(data_transforms, input_list, device, batch_size)
+                instance_img = origin_img
+                instance_input = data_transforms(instance_img).unsqueeze(0)
+                # tb = time.time()
+                output = model_p(instance_input)
+                prob = output[0].softmax(0)
+                output = output.cpu().detach().numpy()
                 # tb = time.time()
                 # print('load data use time : %.2f'%(tb - ta))
                 # exit()
                 # output, _ = model_p(t, w, h)
                 # output = output.cpu().detach().numpy()
-                output = model_p(t).cpu().detach().numpy()
+                # output = model_p(t).cpu().detach().numpy()
                 # print(output.shape)
                 for j in range(output.shape[0]):
                     pred = np.argmax(output[j])

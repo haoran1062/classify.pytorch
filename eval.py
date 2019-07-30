@@ -19,7 +19,7 @@ from utils.train_utils import get_config_map
 from utils.model_utils import initialize_model
 
 # cfg_path = 'configs/classify2050c_densenet121_eval.json'
-cfg_path = 'configs/classify800c_resnext50_512_eval.json'
+cfg_path = 'configs/classify800c_se-resnext50_512_eval.json'
 config_map = get_config_map(cfg_path)
 input_resize = config_map['input_size']
 
@@ -110,10 +110,13 @@ if __name__ == "__main__":
 
     # base_path = '/data/datasets/truth_data/classify_data/top500_checkout/train/20190712_classify_train/'
 
-    base_path = '/data/datasets/truth_data/classify_data/top500_checkout/val/20190712_classify_val/'
+    base_path = '/data/results/temp/classify_instance/201907/done/20190717_classify_test/'
 
     folder_list = os.listdir(base_path)
     it = 0
+    total_right = 0
+    total_wrong = 0
+    cnt_map = {}
     for now_folder in tqdm(folder_list):
         now_base_path = base_path + '%s/'%(now_folder)
 
@@ -136,7 +139,8 @@ if __name__ == "__main__":
                     continue
                 gt_cls = get_cls_by_path(now_path)
                 # ta = time.time()
-                instance_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
+                # instance_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
+                instance_img = origin_img
                 instance_input = data_transforms(instance_img).unsqueeze(0)
                 # tb = time.time()
                 output = model_p(instance_input)
@@ -149,14 +153,31 @@ if __name__ == "__main__":
                         now_cls = id_name_map[pred]
                     else:
                         now_cls = pred
+                        print('fuck')
                     
                     print(gt_cls ,now_cls, prob[pred])
+                    if int(now_cls) == gt_cls:
+                        right += 1
+                    else:
+                        wrong += 1
 
                     cv2.imshow('instance', origin_img)
 
                 if cv2.waitKey(10000)&0xFF == ord('q'):
                     break
-
+            total_right += right
+            total_wrong += wrong
+            cnt_map[gt_cls] = [right, wrong, right / (right + wrong)]
+    
+    meanAcc = 0.0
+    ct = 0
+    for k, v in cnt_map.items():
+        print('%d right: %d, wrong: %d, Acc: %.2f'%(k, v[0], v[1], v[2]))
+        meanAcc += v[2]
+        ct += 1
+    
+    print('meanAcc : %.2f'%(meanAcc / ct))
+    print('Acc : %.2f'%(total_right / (total_right + total_wrong)))
                 
 
 

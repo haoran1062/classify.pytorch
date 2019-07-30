@@ -2,6 +2,7 @@
 import os, sys, numpy as np, random, time, cv2
 import torch
 
+import jpeg4py as jpeg
 from PIL import Image
 import torch.utils.data as data
 import torchvision.transforms as transforms
@@ -136,7 +137,9 @@ class ClassifyDataset(data.Dataset):
         fname = self.fnames[idx]
         if self._test:
             print(fname)
-        img = cv2.imread(fname)
+        # img = cv2.imread(fname)
+        img = jpeg.JPEG(fname).decode()
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         
         h, w, c = img.shape 
         h = float(h/self.origin_img_size[1])
